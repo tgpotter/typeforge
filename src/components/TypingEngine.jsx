@@ -40,25 +40,29 @@ export default function TypingEngine({ text, onComplete }) {
   const [liveAccuracy, setLiveAccuracy] = useState(100)
 
   // Refs for synchronous access inside the event handler — avoids stale closures
-  const startTimeRef  = useRef(null)
-  const typedRef      = useRef('')
-  const statusRef     = useRef('idle')
-  const keystrokesRef = useRef(0)
-  const errorsRef     = useRef(0)
-  const errorKeysRef  = useRef({})
-  const containerRef  = useRef(null)
+  const startTimeRef   = useRef(null)
+  const typedRef       = useRef('')
+  const statusRef      = useRef('idle')
+  const keystrokesRef  = useRef(0)
+  const errorsRef      = useRef(0)
+  const errorKeysRef   = useRef({})
+  const keyTimingsRef  = useRef({})   // { key: [iki_ms, ...] }
+  const lastKeyTimeRef = useRef(null) // timestamp of last valid keystroke
+  const containerRef   = useRef(null)
 
   useEffect(() => { containerRef.current?.focus() }, [])
 
   // Reset all state when the text prop changes so the engine is self-sufficient
   // regardless of whether the parent cycles the key prop.
   useEffect(() => {
-    typedRef.current     = ''
-    startTimeRef.current = null
+    typedRef.current      = ''
+    startTimeRef.current  = null
     keystrokesRef.current = 0
-    errorsRef.current    = 0
-    errorKeysRef.current = {}
-    statusRef.current    = 'idle'
+    errorsRef.current     = 0
+    errorKeysRef.current  = {}
+    keyTimingsRef.current  = {}
+    lastKeyTimeRef.current = null
+    statusRef.current     = 'idle'
     setTyped('')
     setStatus('idle')
     setLiveWpm(0)
@@ -89,6 +93,11 @@ export default function TypingEngine({ text, onComplete }) {
       const next = typedRef.current.slice(0, -1)
       typedRef.current = next
       setTyped(next)
+      // Reset IKI timer after a correction so the pause during backspacing is not
+      // attributed as slow finger movement on the next character typed.
+      // Trade-off: the character following a correction gets no IKI sample for that
+      // occurrence, so keys that frequently follow errors will have fewer samples.
+      lastKeyTimeRef.current = null
       return
     }
 
@@ -97,8 +106,17 @@ export default function TypingEngine({ text, onComplete }) {
     const pos = typedRef.current.length
     if (pos >= text.length) return
 
+    const now = Date.now()
+    if (lastKeyTimeRef.current !== null) {
+      const iki = Math.min(now - lastKeyTimeRef.current, 2000)
+      const expected = text[pos]
+      if (!keyTimingsRef.current[expected]) keyTimingsRef.current[expected] = []
+      keyTimingsRef.current[expected].push(iki)
+    }
+    lastKeyTimeRef.current = now
+
     if (statusRef.current === 'idle') {
-      startTimeRef.current = Date.now()
+      startTimeRef.current = now
       statusRef.current = 'typing'
       setStatus('typing')
     }
@@ -128,11 +146,19 @@ export default function TypingEngine({ text, onComplete }) {
       setLiveWpm(finalWpm)
       setLiveAccuracy(finalAccuracy)
 
+      // Payload shape:
+      //   error_keys:  { char: count }         — number of errors per expected character
+      //   key_timings: { char: [iki_ms, ...] } — inter-keystroke intervals (ms, capped at 2000)
+      //                  attributed to the expected character at each position; arrays may
+      //                  contain more samples than character occurrences when errors are retried.
       onComplete?.({
         wpm: finalWpm,
         accuracy: finalAccuracy,
         duration_sec: Math.round((endTime - startTimeRef.current) / 1000),
         error_keys: { ...errorKeysRef.current },
+        key_timings: Object.fromEntries(
+          Object.entries(keyTimingsRef.current).map(([k, v]) => [k, [...v]])
+        ),
       })
     }
   }, [text, onComplete])
