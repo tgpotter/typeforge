@@ -30,7 +30,7 @@ export default function WeaknessForgePage() {
       await pb.collection('sessions').create({
         user:         user.id,
         module_id:    MODULE_ID,
-        lesson_index: 0,
+        lesson_index: drillOffset,
         ...sessionData,
       })
 
@@ -65,6 +65,7 @@ export default function WeaknessForgePage() {
       setSaveError(true)
     } finally {
       setSaving(false)
+      refetch()
     }
   }
 
