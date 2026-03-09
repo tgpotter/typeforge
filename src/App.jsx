@@ -11,7 +11,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<TypeForgeHome />} />
-      <Route path="/module/weakness" element={<WeaknessForgePage />} />
+      <Route path="/module/weakness" element={<ProtectedRoute><WeaknessForgePage /></ProtectedRoute>} />
       <Route path="/module/:id" element={<ModulePage />} />
       <Route path="/progress"    element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
       <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />

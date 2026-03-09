@@ -15,8 +15,9 @@ export default function WeaknessForgePage() {
   const [drillOffset, setDrillOffset] = useState(0)
   const [result, setResult]           = useState(null)
   const [saving, setSaving]           = useState(false)
+  const [saveError, setSaveError]     = useState(false)
 
-  const { loading, error, hasEnoughData, sessionCount, topErrorKeys, topSlowKeys, drillText } =
+  const { loading, error, refetch, hasEnoughData, sessionCount, topErrorKeys, topSlowKeys, drillText } =
     useWeaknessData(drillOffset)
 
   const handleComplete = async (sessionData) => {
@@ -24,11 +25,12 @@ export default function WeaknessForgePage() {
     if (!isValid) return
 
     setSaving(true)
+    setSaveError(false)
     try {
       await pb.collection('sessions').create({
         user:         user.id,
         module_id:    MODULE_ID,
-        lesson_index: drillOffset,
+        lesson_index: 0,
         ...sessionData,
       })
 
@@ -37,7 +39,9 @@ export default function WeaknessForgePage() {
         existing = await pb.collection('module_progress').getFirstListItem(
           `user = "${user.id}" && module_id = "${MODULE_ID}"`
         )
-      } catch (_) { /* no record yet */ }
+      } catch (err) {
+        if (err.status !== 404) throw err
+      }
 
       if (existing) {
         await pb.collection('module_progress').update(existing.id, {
@@ -58,6 +62,7 @@ export default function WeaknessForgePage() {
       }
     } catch (err) {
       console.error('Failed to save session:', err)
+      setSaveError(true)
     } finally {
       setSaving(false)
     }
@@ -65,6 +70,7 @@ export default function WeaknessForgePage() {
 
   const handleNewDrill = () => {
     setResult(null)
+    setSaveError(false)
     setDrillOffset(o => o + 1)
   }
 
@@ -87,11 +93,11 @@ export default function WeaknessForgePage() {
         {loading ? (
           <LoadingState />
         ) : error ? (
-          <ErrorState />
+          <ErrorState onRetry={refetch} />
         ) : !hasEnoughData ? (
           <NotEnoughDataState sessionCount={sessionCount} onNavigate={() => navigate('/module/foundation')} />
         ) : result ? (
-          <ResultPanel result={result} saving={saving} onRetry={() => setResult(null)} onNewDrill={handleNewDrill} />
+          <ResultPanel result={result} saving={saving} saveError={saveError} onRetry={() => setResult(null)} onNewDrill={handleNewDrill} />
         ) : (
           <>
             {/* Weakness analysis panel */}
@@ -132,8 +138,12 @@ export default function WeaknessForgePage() {
               </div>
             </div>
 
-            {drillText && (
+            {drillText ? (
               <TypingEngine key={drillText} text={drillText} onComplete={handleComplete} />
+            ) : (
+              <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: 13, fontFamily: "'Lexend', sans-serif", padding: '32px 0' }}>
+                Not enough word bank coverage for your current weak keys.
+              </div>
             )}
           </>
         )}
@@ -163,7 +173,7 @@ function WeaknessColumn({ title, keys }) {
   )
 }
 
-function ResultPanel({ result, saving, onRetry, onNewDrill }) {
+function ResultPanel({ result, saving, saveError, onRetry, onNewDrill }) {
   const meetsTarget = result.accuracy >= 95
 
   return (
@@ -171,7 +181,7 @@ function ResultPanel({ result, saving, onRetry, onNewDrill }) {
       <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 32 }}>
         {[
           { label: 'WPM',      value: result.wpm },
-          { label: 'Accuracy', value: `${result.accuracy}%` },
+          { label: 'Accuracy', value: `${result.accuracy.toFixed(1)}%` },
           { label: 'Time',     value: `${result.duration_sec}s` },
         ].map(({ label, value }) => (
           <div key={label} style={{ background: 'rgba(255,255,255,0.04)', border: `1px solid ${MODULE_COLOR}30`, borderRadius: 16, padding: '28px 36px' }}>
@@ -190,6 +200,12 @@ function ResultPanel({ result, saving, onRetry, onNewDrill }) {
       {saving && (
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em', marginBottom: 20 }}>
           SAVING SESSION...
+        </div>
+      )}
+
+      {saveError && (
+        <div style={{ fontSize: 12, color: 'rgba(255,120,120,0.7)', marginBottom: 20 }}>
+          Session could not be saved. Your progress may not be recorded.
         </div>
       )}
 
@@ -215,12 +231,15 @@ function LoadingState() {
   )
 }
 
-function ErrorState() {
+function ErrorState({ onRetry }) {
   return (
     <div style={{ textAlign: 'center', paddingTop: 80 }}>
-      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontFamily: "'Lexend', sans-serif" }}>
+      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontFamily: "'Lexend', sans-serif", marginBottom: 20 }}>
         Failed to load session data.
       </div>
+      <button onClick={onRetry} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, padding: '10px 24px', cursor: 'pointer', fontFamily: "'Lexend', sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+        Retry
+      </button>
     </div>
   )
 }

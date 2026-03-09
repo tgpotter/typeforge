@@ -104,7 +104,7 @@ export function analyzeSlowKeys(sessions) {
     for (const [char, ikis] of Object.entries(session.key_timings ?? {})) {
       if (char === ' ') continue
       if (!pool[char]) pool[char] = []
-      pool[char].push(...ikis)
+      for (const iki of ikis) pool[char].push(iki)
     }
   }
 
@@ -117,6 +117,7 @@ export function analyzeSlowKeys(sessions) {
   const allMedianValues = Object.values(charMedians)
   if (allMedianValues.length < 2) return []
   const globalMedian = median(allMedianValues)
+  if (!globalMedian) return []
 
   return Object.entries(charMedians)
     .map(([char, med]) => ({
@@ -150,8 +151,9 @@ export function generateDrillText(topErrorKeys, topSlowKeys, drillOffset = 0) {
   // Sample 2 words per weak character from its word bank
   const wordGroups = weakChars.map(char => shuffle(WORD_BANK[char], rng).slice(0, 2))
 
-  // Bigram-approximation patterns: all pairs of weak chars (including self-pairs)
-  // force the user to type those transitions consecutively
+  // Bigram-approximation patterns: all pairs of weak chars (including self-pairs).
+  // These produce tokens like "aa", "af", "ff" — intentionally not real words.
+  // They force the user to type the target transition consecutively.
   const bigramParts = []
   for (let i = 0; i < weakChars.length; i++) {
     for (let j = i; j < weakChars.length; j++) {

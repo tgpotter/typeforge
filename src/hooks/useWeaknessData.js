@@ -11,24 +11,24 @@ import {
 } from '../lib/weaknessEngine'
 
 export function useWeaknessData(drillOffset = 0) {
-  const { sessions, loading, error } = useProgressData()
+  const { sessions, loading, error, refetch } = useProgressData()
 
   const result = useMemo(() => {
-    const window = sessions.slice(-ANALYSIS_WINDOW)
+    const recentSessions = sessions.slice(-ANALYSIS_WINDOW)
 
-    const { totalSessions, totalKeystrokes } = computeSessionStats(window)
+    const { totalSessions, totalKeystrokes } = computeSessionStats(recentSessions)
     const hasEnoughData = totalSessions >= MIN_SESSIONS && totalKeystrokes >= MIN_KEYSTROKES
 
     if (!hasEnoughData) {
       return { hasEnoughData: false, sessionCount: totalSessions, topErrorKeys: [], topSlowKeys: [], drillText: null }
     }
 
-    const topErrorKeys = analyzeErrorKeys(window)
-    const topSlowKeys  = analyzeSlowKeys(window)
+    const topErrorKeys = analyzeErrorKeys(recentSessions)
+    const topSlowKeys  = analyzeSlowKeys(recentSessions)
     const drillText    = generateDrillText(topErrorKeys, topSlowKeys, drillOffset)
 
     return { hasEnoughData: true, sessionCount: totalSessions, topErrorKeys, topSlowKeys, drillText }
   }, [sessions, drillOffset])
 
-  return { loading, error, ...result }
+  return { loading, error, refetch, ...result }
 }
