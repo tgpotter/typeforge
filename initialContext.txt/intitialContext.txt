@@ -1,0 +1,97 @@
+Project Idea:
+Speed Typing Trainer
+I would like to do some deep research into the best ways to improve typing skill. With the knowledge gained create a program that incorporates the methods found during research to practice typing in a manner which accelerates growth. The program will include strong tracking features, graphs displaying progress and tailored lessons for each user depending on their weaknesses which will also need to be ascertained from data gathered during typing practice. It would also be good to gamify the experience to encourage progress in a way simply outside of learning progress. This game aspect will also help to get through times where users may plateau for a time.
+
+
+Start with research, find the best methods of learning and improving typing speed.
+
+10:59 PM
+Searched the web
+Searched the web
+Here's a comprehensive breakdown of the best research-backed methods for improving typing speed:
+
+🏆 The #1 Method: Touch Typing
+Touch typing means using all 10 fingers with each finger assigned to specific keys, without looking at the keyboard. It is the single most effective way to increase typing speed because it eliminates the visual search that slows most people down.
+TextExpander
+
+The average person types around 40 words per minute, but someone who uses the touch-type method can exceed 75 WPM, completing work much more quickly and with minimal errors.
+Herzing University
+
+Home Row Foundation: Place your left hand on A, S, D, and F, and your right hand on J, K, L, and the semicolon key, hovering your thumbs over the space bar. Always return your hands to this starting position to maintain consistent speed.
+Ditto Transcripts
+
+📐 Accuracy Before Speed
+The practical approach: slow down until you can type a full paragraph with zero errors. Then increase speed by 5 WPM and stabilize again. This staircase method builds reliable muscle memory at each level before pushing further. Target 95% accuracy before worrying about speed at all — if accuracy drops below 95% during a speed test, you're typing too fast for your current skill level.
+TextExpander
+
+🎯 Deliberate, Targeted Practice
+Deliberate typing practice produces the fastest results. Start by identifying which keys or key combinations slow you down. Common trouble spots include less-used keys like Z, X, Q, punctuation marks, and number row keys. Drill those specific keys until they feel automatic. The 1,000 most common English words make up roughly 85% of everyday writing, so getting fast on those words has an outsized impact on practical typing speed.
+TextExpander
+
+After finishing exercises, practice missed words specifically. Make note of words, letters, or letter combinations you struggle with — these can then be used in custom practice sessions. One or two such special training sessions each week allows you to exploit your weaknesses for maximum effect.
+Medium
+
+⏱️ Daily Practice Routine
+Set aside 2–4 weeks for regular training every day for 30 minutes. Exercise for only 15–30 minutes a day and in a few weeks, you will know the exact location of each key without looking at the keyboard. The key is to practice continuously — as soon as you miss a lesson, you lose ground on the previous ones.
+Ratatype
+
+A structured session suggested by experts:
+
+5 min warm-up on home row exercises
+5 min drilling your weakest keys
+5 min typing full paragraphs at comfortable pace, aiming for zero errors
+📊 Track Your Progress
+Keep a record of your WPM and accuracy rates — this helps you see your improvement and identify areas needing more focus. Set achievable goals, such as increasing WPM by five each month.
+Tactiq
+
+🖥️ Best Free Tools (Progressive Difficulty)
+A proven progression: start with TypingClub until you reach ~30 WPM (teaches touch typing basics), then move to Keybr (focuses on letters you struggle with most), then use Nitro Type for speed, TypeRacer for accuracy, and MonkeyType in quote mode for consistency and stamina.
+Medium
+
+🪑 Ergonomics & Posture
+Keep your body and shoulders relaxed while you type. Your wrists should not touch the tabletop while typing — this limits mobility and can strain your wrists. Keep your elbows tucked close to your sides to create an ideal typing environment.
+Notta
+
+⚡ Breaking Through Plateaus
+Practice typing different types of content — technical documents, fiction, or code — to expose yourself to new vocabulary and typing patterns. Use typing software that progressively increases difficulty to keep yourself challenged.
+Tactiq
+
+The bottom line: Master touch typing → prioritize accuracy → drill weak spots daily for 15–30 minutes → track WPM weekly → push speed up in 5 WPM increments only after stabilizing. Most people who follow this method see dramatic improvement within 4–8 weeks.
+
+Using this knowledge, create a training program which can be incorporated into our program. We will need parts of the program for practicing each of these core points. Once you have a plan for the training program we can start to work on the core app and start with a home interface.
+
+11:03 PM
+Let me start by reading the frontend design skill to ensure I build something high quality.
+
+
+Reading frontend design skill
+Reading frontend design skill
+Now let me plan the full training program and build the home interface.
+
+
+Created a file, read a file
+Created a file, read a file
+Here's TypeForge — the home interface for your typing training program. Here's what's been built and planned:
+
+The 8-Module Training Program:
+
+#	Module	Core Research Point
+01	Home Row Foundation	ASDF JKL; anchor, muscle memory base
+02	10-Finger Mastery	Every finger owns keys, eliminate hunt-and-peck
+03	Accuracy Clinic	95% accuracy before speed — the staircase method
+04	High-Frequency Words	Top 1,000 words = 85% of real typing
+05	Speed Laddering	+5 WPM at a time, stabilize before climbing
+06	Weakness Forge	AI-targeted bigrams & missed key drills
+07	Stamina & Flow	Long-form sessions for consistency & endurance
+08	Posture & Ergonomics	Injury prevention, sustainable practice
+What the home interface includes:
+
+Animated keyboard graphic showing home row keys
+Stats dashboard (WPM, accuracy, streak, practice time)
+Clickable module cards with difficulty, duration, focus keys, and progress bars
+Module detail panel with week-by-week training plan (click any card)
+Research summary banner with key metrics
+Ready to build next: Let me know which module to tackle first — the actual practice interface — or if you'd like to adjust the program structure or visual design before we continue.
+
+Typeforge home
+Code · JSX
