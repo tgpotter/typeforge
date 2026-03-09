@@ -4,6 +4,7 @@ import TypingEngine from '../components/TypingEngine'
 import { LESSONS } from '../data/lessons'
 import { MODULE_META } from '../data/modules'
 import pb from '../lib/pb'
+import { useAuth } from '../auth/useAuth'
 
 export default function ModulePage() {
   const { id } = useParams()
@@ -12,6 +13,7 @@ export default function ModulePage() {
   const [result, setResult] = useState(null)
   const [saving, setSaving] = useState(false)
 
+  const { isValid, user } = useAuth()
   const meta    = MODULE_META[id]
   const lessons = LESSONS[id] ?? []
   const lesson  = lessons[lessonIndex]
@@ -27,10 +29,10 @@ export default function ModulePage() {
 
   const handleComplete = async (sessionData) => {
     setResult(sessionData)
-    if (!pb.authStore.isValid) return
+    if (!isValid) return
 
     setSaving(true)
-    const userId = pb.authStore.model.id
+    const userId = user.id
     try {
       // Save session
       await pb.collection('sessions').create({

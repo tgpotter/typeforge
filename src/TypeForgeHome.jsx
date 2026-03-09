@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MODULES } from "./data/modules";
+import { useAuth } from "./auth/useAuth";
 
 const STATS = [
   { label: "Current WPM", value: "—", unit: "" },
@@ -268,9 +269,10 @@ export default function TypeForgeHome() {
   const [selectedModule, setSelectedModule] = useState(null);
   const [navSolid, setNavSolid] = useState(false);
   const navigate = useNavigate();
+  const { isValid, user, signOut, openAuthModal } = useAuth();
 
   useEffect(() => {
-    const onScroll = () => setNavSolid(window.navSolid);
+    const onScroll = () => setNavSolid(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -332,12 +334,26 @@ export default function TypeForgeHome() {
             >{item}</span>
           ))}
         </div>
-        <button style={{
-          background: "#E8FF47", border: "none", borderRadius: 8,
-          padding: "9px 20px", cursor: "pointer",
-          fontFamily: "'Atkinson Hyperlegible', sans-serif", fontWeight: 700, fontSize: 13,
-          color: "#000",
-        }}>Quick Test →</button>
+        {isValid ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)", fontFamily: "'Lexend', sans-serif" }}>
+              {user?.username ?? user?.email}
+            </span>
+            <button onClick={signOut} style={{
+              background: "transparent", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
+              padding: "9px 16px", cursor: "pointer",
+              fontFamily: "'Lexend', sans-serif", fontSize: 12,
+              color: "rgba(255,255,255,0.6)",
+            }}>Sign Out</button>
+          </div>
+        ) : (
+          <button onClick={openAuthModal} style={{
+            background: "#E8FF47", border: "none", borderRadius: 8,
+            padding: "9px 20px", cursor: "pointer",
+            fontFamily: "'Atkinson Hyperlegible', sans-serif", fontWeight: 700, fontSize: 13,
+            color: "#000",
+          }}>Sign In →</button>
+        )}
       </nav>
 
       {/* Hero */}
