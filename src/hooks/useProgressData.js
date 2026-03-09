@@ -30,14 +30,17 @@ export function useProgressData() {
     setLoading(true)
     setError(null)
 
+    // Use getList instead of getFullList — getFullList sends skipTotal=1 which
+    // PocketBase v0.23+ rejects with 400. 500 sessions is well beyond any realistic
+    // user history for a typing trainer.
     Promise.all([
-      pb.collection('sessions').getFullList({
+      pb.collection('sessions').getList(1, 500, {
         filter: `user = "${user.id}"`,
         sort:   'created',
-      }),
-      pb.collection('module_progress').getFullList({
+      }).then(r => r.items),
+      pb.collection('module_progress').getList(1, 500, {
         filter: `user = "${user.id}"`,
-      }),
+      }).then(r => r.items),
     ])
       .then(([sess, progress]) => {
         if (!active) return
