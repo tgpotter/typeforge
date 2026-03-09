@@ -15,7 +15,9 @@ export default function ProgressPage() {
 
   const totalMin    = useMemo(() => Math.round(sessions.reduce((acc, s) => acc + (s.duration_sec ?? 0), 0) / 60), [sessions])
   const bestWpm     = useMemo(() => moduleProgress.reduce((max, p) => Math.max(max, p.best_wpm      ?? 0), 0), [moduleProgress])
-  const bestAccuracy= useMemo(() => moduleProgress.reduce((max, p) => Math.max(max, p.best_accuracy ?? 0), 0), [moduleProgress])
+  const avgAccuracy = useMemo(() => sessions.length
+    ? Math.round(sessions.reduce((sum, s) => sum + (s.accuracy ?? 0), 0) / sessions.length)
+    : 0, [sessions])
   const progressMap = useMemo(() => Object.fromEntries(moduleProgress.map(p => [p.module_id, p])), [moduleProgress])
   const hasData     = sessions.length > 0
 
@@ -48,7 +50,7 @@ export default function ProgressPage() {
             <SummaryCard label="Sessions"      value={sessions.length || '—'} />
             <SummaryCard label="Practice Time" value={totalMin > 0 ? `${totalMin}m` : '—'} />
             <SummaryCard label="Best WPM"      value={bestWpm || '—'} accent />
-            <SummaryCard label="Best Accuracy" value={bestAccuracy ? `${Math.round(bestAccuracy)}%` : '—'} />
+            <SummaryCard label="Avg Accuracy"  value={avgAccuracy ? `${avgAccuracy}%` : '—'} />
           </div>
 
           {hasData ? (
