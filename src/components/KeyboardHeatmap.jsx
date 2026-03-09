@@ -103,6 +103,9 @@ export default function KeyboardHeatmap({ sessions }) {
   const hoveredT     = hoveredKey ? tForKey(hoveredKey) : null
   const trend        = hoveredKey ? sessionTrend(sessions, hoveredKey) : []
   const trendPoints  = trend.length >= 2 ? sparklinePoints(trend, 110, 32) : null
+  // Flip tooltip below the key when the key is near the top of the container
+  // to prevent it from being clipped above the visible area
+  const tooltipBelow = tooltipPos.y < 130
 
   return (
     <div ref={containerRef} style={{ position: 'relative', display: 'inline-block' }}>
@@ -191,7 +194,7 @@ export default function KeyboardHeatmap({ sessions }) {
         <div style={{
           position:      'absolute',
           left:          tooltipPos.x,
-          top:           tooltipPos.y - 120,
+          top:           tooltipBelow ? tooltipPos.y + KEY_SIZE + 8 : tooltipPos.y - 120,
           transform:     'translateX(-50%)',
           background:    'rgba(10,10,10,0.96)',
           border:        '1px solid rgba(255,255,255,0.12)',

@@ -24,10 +24,14 @@ export default function SessionLineChart({ sessions, dataKey, label, yDomain, re
     const src = selectedModule
       ? sessions.filter(s => s.module_id === selectedModule)
       : sessions
-    return src.map(s => ({
-      date:  new Date(s.created).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      value: s[dataKey],
-    }))
+    // Aggregate to one point per calendar day (last session of the day wins)
+    // so multiple same-day sessions don't produce duplicate x-axis labels.
+    const byDay = new Map()
+    for (const s of src) {
+      const day = new Date(s.created).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      byDay.set(day, s[dataKey])
+    }
+    return Array.from(byDay.entries()).map(([date, value]) => ({ date, value }))
   }, [sessions, selectedModule, dataKey])
 
   const lineColor = selectedModule ? (MODULE_META[selectedModule]?.color ?? '#E8FF47') : '#E8FF47'

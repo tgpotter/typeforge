@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { useProgressData } from '../hooks/useProgressData'
@@ -12,10 +13,10 @@ export default function ProgressPage() {
   const { user }  = useAuth()
   const { sessions, moduleProgress, loading, error, refetch } = useProgressData()
 
-  const totalMin    = Math.round(sessions.reduce((acc, s) => acc + (s.duration_sec ?? 0), 0) / 60)
-  const bestWpm     = moduleProgress.length ? Math.max(...moduleProgress.map(p => p.best_wpm     ?? 0)) : 0
-  const bestAccuracy= moduleProgress.length ? Math.max(...moduleProgress.map(p => p.best_accuracy ?? 0)) : 0
-  const progressMap = Object.fromEntries(moduleProgress.map(p => [p.module_id, p]))
+  const totalMin    = useMemo(() => Math.round(sessions.reduce((acc, s) => acc + (s.duration_sec ?? 0), 0) / 60), [sessions])
+  const bestWpm     = useMemo(() => moduleProgress.reduce((max, p) => Math.max(max, p.best_wpm      ?? 0), 0), [moduleProgress])
+  const bestAccuracy= useMemo(() => moduleProgress.reduce((max, p) => Math.max(max, p.best_accuracy ?? 0), 0), [moduleProgress])
+  const progressMap = useMemo(() => Object.fromEntries(moduleProgress.map(p => [p.module_id, p])), [moduleProgress])
   const hasData     = sessions.length > 0
 
   return (
@@ -47,7 +48,7 @@ export default function ProgressPage() {
             <SummaryCard label="Sessions"      value={sessions.length || '—'} />
             <SummaryCard label="Practice Time" value={totalMin > 0 ? `${totalMin}m` : '—'} />
             <SummaryCard label="Best WPM"      value={bestWpm || '—'} accent />
-            <SummaryCard label="Best Accuracy" value={bestAccuracy ? `${bestAccuracy}%` : '—'} />
+            <SummaryCard label="Best Accuracy" value={bestAccuracy ? `${Math.round(bestAccuracy)}%` : '—'} />
           </div>
 
           {hasData ? (

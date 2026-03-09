@@ -37,8 +37,8 @@ export default function ModuleProgressCard({ module: mod, progress }) {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <MiniStat label="WPM"      value={progress?.best_wpm ?? '—'}                             color={mod.color} />
-        <MiniStat label="Accuracy" value={progress?.best_accuracy != null ? `${progress.best_accuracy}%` : '—'} color={mod.color} />
+        <MiniStat label="WPM"      value={progress?.best_wpm ?? '—'} color={mod.color} />
+        <MiniStat label="Accuracy" value={progress?.best_accuracy != null ? `${Math.round(progress.best_accuracy)}%` : '—'} color={mod.color} />
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: hasData ? 10 : 0 }}>
